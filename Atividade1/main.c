@@ -1,6 +1,12 @@
 #include <GL/glut.h>
 #include <stdio.h>
 
+int tx = 0;
+int ty = 0;
+
+int cx = 5;
+int cy = 5;
+
 void drawSquare() {
   glColor3f(1.0, 0.0, 0.0);
   glBegin(GL_POLYGON);
@@ -19,6 +25,13 @@ int init(void){
 
 void display(void){
   glClear(GL_COLOR_BUFFER_BIT);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+  glTranslatef(cx, cy, 0);             // Move para a posicao inicial
+  glScalef(1.25,1.25,1.0);             // Escala
+  glTranslatef(-cx, -cy, 0);           // Move de volta
+
   drawSquare();
   glFlush();
 }
