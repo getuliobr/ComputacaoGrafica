@@ -1,14 +1,25 @@
 #include <GL/glut.h>
 #include <stdio.h>
 
+void drawSquare() {
+  glColor3f(1.0, 0.0, 0.0);
+  glBegin(GL_POLYGON);
+  glVertex2i(0, 0);
+  glVertex2i(10, 0);
+  glVertex2i(10, 10);
+  glVertex2i(0, 10);
+  glEnd();
+}
+
 int init(void){
   glClearColor(1.0, 1.0, 1.0, 0.0);
   glMatrixMode(GL_PROJECTION);
-  gluOrtho2D(0.0,100.0,0.0,100.0);
+  gluOrtho2D(0.0, 100.0, 0.0, 100.0);
 }
 
 void display(void){
   glClear(GL_COLOR_BUFFER_BIT);
+  drawSquare();
   glFlush();
 }
 
