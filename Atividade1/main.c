@@ -1,8 +1,13 @@
 #include <GL/glut.h>
 #include <stdio.h>
 
-int tx = 0;
-int ty = 0;
+int tx = 20;
+int ty = 80;
+
+int sx = 1;
+int sy = 1;
+
+int theta = 32;
 
 int cx = 5;
 int cy = 5;
@@ -28,8 +33,10 @@ void display(void){
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
+  glTranslatef(tx, ty, 0);
   glTranslatef(cx, cy, 0);             // Move para a posicao inicial
-  glScalef(1.25,1.25,1.0);             // Escala
+  glScalef(sx, sy, 1.0);             // Escala
+  glRotatef(theta, 0, 0, 1); 
   glTranslatef(-cx, -cy, 0);           // Move de volta
 
   drawSquare();
@@ -38,6 +45,7 @@ void display(void){
 
 void specialKey(int key, int x, int y) {
   printf("Pressed special: %d\n", key);
+  tx++;
 }
 
 void normalKey(unsigned char key, int x, int y) {
