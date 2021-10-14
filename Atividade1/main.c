@@ -1,13 +1,12 @@
 #include <GL/glut.h>
 #include <stdio.h>
 
-int tx = 20;
-int ty = 80;
+int tx = 0;
+int ty = 0;
 
-int sx = 1;
-int sy = 1;
+float scale = 1;
 
-int theta = 32;
+int theta = 0;
 
 int cx = 5;
 int cy = 5;
@@ -43,7 +42,7 @@ void display(void){
 
   glTranslatef(tx, ty, 0);
   glTranslatef(cx, cy, 0);             // Move para a posicao inicial
-  glScalef(sx, sy, 1.0);               // Escala
+  glScalef(scale, scale, 1.0);               // Escala
   glRotatef(theta, 0, 0, 1);           // Rotaciona
   glTranslatef(-cx, -cy, 0);           // Move de volta
 
@@ -52,38 +51,40 @@ void display(void){
 }
 
 void specialKey(int key, int x, int y) {
-  printf("Pressed special: %d\n", key);
   switch (key) {
     case GLUT_KEY_UP:
-      if(currMode == TRANSLATION) {
-        tx++;
-      }
+      if(currMode == TRANSLATION) ty++;
+      if(currMode == SCALE) scale += 0.2;
       break;
     case GLUT_KEY_DOWN:
-      if(currMode == TRANSLATION) {
-        tx--;
-      }
+      if(currMode == TRANSLATION) ty--;
+      if(currMode == SCALE) scale -= 0.2;
       break;
     case GLUT_KEY_LEFT:
+      if(currMode == TRANSLATION) tx--;
+      if(currMode == ROTATION) theta--;
       break;
     case GLUT_KEY_RIGHT:
+      if(currMode == TRANSLATION) tx++;
+      if(currMode == ROTATION) theta++;
       break;
+    default:
+      return;
   }
   glutPostRedisplay();
 }
 
 void normalKey(unsigned char key, int x, int y) {
-  switch (key)
-  {
-  case 'r':
-    currMode = ROTATION;
-    break;
-  case 't':
-    currMode = TRANSLATION;
-    break;
-  case 's':
-    currMode = SCALE;
-    break;
+  switch (key) {
+    case 'r':
+      currMode = ROTATION;
+      break;
+    case 't':
+      currMode = TRANSLATION;
+      break;
+    case 's':
+      currMode = SCALE;
+      break;
   }
 }
 
