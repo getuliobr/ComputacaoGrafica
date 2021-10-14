@@ -35,8 +35,8 @@ void display(void){
 
   glTranslatef(tx, ty, 0);
   glTranslatef(cx, cy, 0);             // Move para a posicao inicial
-  glScalef(sx, sy, 1.0);             // Escala
-  glRotatef(theta, 0, 0, 1); 
+  glScalef(sx, sy, 1.0);               // Escala
+  glRotatef(theta, 0, 0, 1);           // Rotaciona
   glTranslatef(-cx, -cy, 0);           // Move de volta
 
   drawSquare();
