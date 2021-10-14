@@ -12,6 +12,14 @@ int theta = 32;
 int cx = 5;
 int cy = 5;
 
+typedef enum mode{
+  TRANSLATION,
+  SCALE,
+  ROTATION
+} Modes;
+
+Modes currMode = TRANSLATION;
+
 void drawSquare() {
   glColor3f(1.0, 0.0, 0.0);
   glBegin(GL_POLYGON);
@@ -45,11 +53,38 @@ void display(void){
 
 void specialKey(int key, int x, int y) {
   printf("Pressed special: %d\n", key);
-  tx++;
+  switch (key) {
+    case GLUT_KEY_UP:
+      if(currMode == TRANSLATION) {
+        tx++;
+      }
+      break;
+    case GLUT_KEY_DOWN:
+      if(currMode == TRANSLATION) {
+        tx--;
+      }
+      break;
+    case GLUT_KEY_LEFT:
+      break;
+    case GLUT_KEY_RIGHT:
+      break;
+  }
+  glutPostRedisplay();
 }
 
 void normalKey(unsigned char key, int x, int y) {
-  printf("Pressed normal: %c\n", key);
+  switch (key)
+  {
+  case 'r':
+    currMode = ROTATION;
+    break;
+  case 't':
+    currMode = TRANSLATION;
+    break;
+  case 's':
+    currMode = SCALE;
+    break;
+  }
 }
 
 int main(int argc, char** argv) {
