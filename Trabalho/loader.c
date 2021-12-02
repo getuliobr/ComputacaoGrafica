@@ -5,8 +5,13 @@
 
 #define MIN_VEC_SIZE 10000
 
-bool loadOBJ(const char * path, vector* out_vertices, vector* out_uvs, vector* out_normals) {
+Object* loadOBJ(const char* path, bool* result) {
   FILE * file = fopen(path, "r");
+  if( file == NULL ){
+    printf("Impossible to open the file !\n");
+    *result = false;
+    return NULL;
+  }
 
   vector* vertexUvNormalIndices = create_vector(MIN_VEC_SIZE);
 
@@ -14,10 +19,12 @@ bool loadOBJ(const char * path, vector* out_vertices, vector* out_uvs, vector* o
   vector* temp_uvs = create_vector(MIN_VEC_SIZE);
   vector* temp_normals = create_vector(MIN_VEC_SIZE);
 
-  if( file == NULL ){
-    printf("Impossible to open the file !\n");
-    return false;
-  }
+
+  Object* obj = (Object*) malloc(sizeof(Object));
+  obj->vertices = create_vector(MIN_VEC_SIZE);
+  obj->uvs = create_vector(MIN_VEC_SIZE);
+  obj->normals = create_vector(MIN_VEC_SIZE);
+
   while( 1 ){
 
     char lineHeader[128];
@@ -42,7 +49,13 @@ bool loadOBJ(const char * path, vector* out_vertices, vector* out_uvs, vector* o
       int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
       if (matches != 9){
         printf("File can't be read by our simple parser : ( Try exporting with other options\n");
-        return false;
+        free_vector(vertexUvNormalIndices);
+        free_vector(temp_vertices);
+        free_vector(temp_uvs);
+        free_vector(temp_normals);
+        freeOBJ(obj);
+        *result = false;
+        return NULL;
       }
       vec3 vun0 = {vertexIndex[0], uvIndex[0], normalIndex[0]};
       push_back(vertexUvNormalIndices, vun0);
@@ -59,15 +72,15 @@ bool loadOBJ(const char * path, vector* out_vertices, vector* out_uvs, vector* o
   for( unsigned int i=0; i < vertexUvNormalIndices->curr; i++ ) {
     int vertexIndex = vertexUvNormalIndices->vector[i].x;
     vec3 vertex = temp_vertices->vector[vertexIndex-1];
-    push_back(out_vertices, vertex);
+    push_back(obj->vertices, vertex);
 
     int uvIndex = vertexUvNormalIndices->vector[i].y;
     vertex = temp_uvs->vector[uvIndex-1];
-    push_back(out_uvs, vertex);
+    push_back(obj->uvs, vertex);
 
     int normalIndex = vertexUvNormalIndices->vector[i].z;
     vertex = temp_normals->vector[normalIndex-1];
-    push_back(out_normals, vertex);
+    push_back(obj->normals, vertex);
   }
 
   free_vector(vertexUvNormalIndices);
@@ -75,5 +88,13 @@ bool loadOBJ(const char * path, vector* out_vertices, vector* out_uvs, vector* o
   free_vector(temp_uvs);
   free_vector(temp_normals);
 
-  return true;
+  *result = true;
+  return obj;
+}
+
+void freeOBJ(Object* obj) {
+  free_vector(obj->vertices);
+  free_vector(obj->uvs);
+  free_vector(obj->normals);
+  free(obj);
 }

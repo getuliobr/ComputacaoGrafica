@@ -1,4 +1,11 @@
 #include "structures.h"
 #pragma once
 
-bool loadOBJ(const char * path, vector* out_vertices, vector* out_uvs, vector* out_normals);
+typedef struct {
+  vector* vertices;
+  vector* normals;
+  vector* uvs;
+} Object;
+
+Object* loadOBJ(const char * path, bool* result);
+void freeOBJ(Object* obj);

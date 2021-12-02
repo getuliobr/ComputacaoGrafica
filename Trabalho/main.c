@@ -4,9 +4,7 @@
 #include "structures.h"
 #include "loader.h"
 
-vector* vertices;
-vector* uvs;
-vector* normals;
+Object* obj;
 bool res;
 
 float globalEyeX = 0;
@@ -29,77 +27,33 @@ void loop(int v) {
   glutTimerFunc(1000/FPS, loop, 0);
 }
 
-typedef enum { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT } Position;
-
-void bule(Position pos) {
+void drawObject(Object* obj) {
   glPushMatrix();
 
-  int x = pos == TOP_LEFT || pos == BOTTOM_LEFT ? 0 : 400;
-  int y = pos == TOP_LEFT || pos == TOP_RIGHT ? 400 : 0;
-
-  glViewport(x, y, 400, 400);
+  glViewport(0, 0, 800, 800);
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  pos != BOTTOM_RIGHT ? glOrtho(-3, 3, -3, 3, 1, 50) : gluPerspective(70, 1, 1, 500);
+  gluPerspective(70, 1, 1, 500);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  
-  float eyeX = 0;
-  float eyeY = 0;
-  float eyeZ = 0;
-  float upX = 0;
-  float upY = 0;
-  float upZ = 0;
 
-  switch (pos) {
-    case TOP_LEFT:
-      eyeY = 3;
-      upY = -1;
-      upZ = -1;
-      break;
-    
-    case TOP_RIGHT:
-      eyeX = -3;
-      upY = 1;
-      break;
-
-    case BOTTOM_LEFT:
-      eyeZ = 3;
-      upY = 1;
-      break;
-
-    case BOTTOM_RIGHT:
-      eyeX = globalEyeX;
-      eyeY = globalEyeY;
-      eyeZ = globalEyeZ;
-      upY = 1;
-      break;
-
-    default:
-      break;
-  }
-
-  gluLookAt(eyeX, eyeY, eyeZ,
+  gluLookAt(globalEyeX, 5, globalEyeZ,
             0, 0, 0,
-            upX, upY, upZ);
+            0, 1, 0);
 
-  if(pos == BOTTOM_RIGHT) {
-    glRotatef(-90, 1, 0, 0);
-    glRotatef(spin, 0, 0, 1);
-    glBegin(GL_TRIANGLES);
-    for(int i = 0; i < vertices->curr && res == true; i += 1) {
-      vec3 v = vertices->vector[i];
-      vec3 n = normals->vector[i];
-      vec3 u = uvs->vector[i];
-      glNormal3f(n.x, n.y, n.z);
-      glTexCoord2f(u.x, u.y);
-      glVertex3f(v.x, v.y, v.z);
-    }
-    glEnd();
-  } else {
-    glutWireTeapot(2);
+  glRotatef(-90, 1, 0, 0);
+  glRotatef(spin, 0, 0, 1);
+  glBegin(GL_TRIANGLES);
+  for(int i = 0; i < obj->vertices->curr && res == true; i += 1) {
+    vec3 v = obj->vertices->vector[i];
+    vec3 n = obj->normals->vector[i];
+    vec3 u = obj->uvs->vector[i];
+    glNormal3f(n.x, n.y, n.z);
+    glTexCoord2f(u.x, u.y);
+    glVertex3f(v.x, v.y, v.z);
   }
+  glEnd();
 
   glPopMatrix();
 }
@@ -108,10 +62,7 @@ void display(void){
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glColor3f(1.0f, 0.0f, 0.0f);
 
-  bule(TOP_LEFT);
-  bule(TOP_RIGHT);
-  bule(BOTTOM_LEFT);
-  bule(BOTTOM_RIGHT);
+  drawObject(obj);
 
   glFlush();
 }
@@ -119,17 +70,17 @@ void display(void){
 void specialKey(int key, int x, int y) {
   switch (key) {
     case GLUT_KEY_UP:
-      globalEyeY += 1;
+      globalEyeX += 1;
       break;
     case GLUT_KEY_DOWN:
-      globalEyeY -= 1;
+      globalEyeX -= 1;
       break;
     case GLUT_KEY_LEFT:
-      globalEyeX -= 1;
+      globalEyeZ -= 1;
       
       break;
     case GLUT_KEY_RIGHT:
-      globalEyeX += 1;
+      globalEyeZ += 1;
       
       break;
     default:
@@ -143,11 +94,8 @@ int main(int argc, char** argv) {
   glutInitWindowSize(800, 800);
   glutCreateWindow("Trabalho");
 
-  vertices = create_vector(1000);
-  uvs = create_vector(1000);
-  normals = create_vector(1000);
   if(argc == 2) {
-    res = loadOBJ(argv[1], vertices, uvs, normals);
+    obj = loadOBJ(argv[1], &res);
 
     init();
     
